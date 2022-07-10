@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="GlobalUsingsAnalyzer.0e53c8a5-e6b3-41ea-b169-b824407356f4" Version="1.0" Language="en-US" Publisher="elici"/>
-    <DisplayName>GlobalUsingsAnalyzer</DisplayName>
-    <Description xml:space="preserve">This is a sample diagnostic extension for the .NET Compiler Platform ("Roslyn").</Description>
+    <Identity Id="0e53c8a5-e6b3-41ea-b169-b824407356f4" Version="1.0" Language="en-US" Publisher="BDSoftware"/>
+    <DisplayName>Global usings analyzer</DisplayName>
+    <Description xml:space="preserve">A C# Roslyn analyzer to move using statements to a single file in each project.</Description>
+	<Icon>logo.png</Icon>
   </Metadata>
   <Installation>
-    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0,)" />
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[16.0, 17.0)" />
   </Installation>
   <Dependencies>
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+	<Dependency Id="Microsoft.VisualStudio.MPF.16.0" DisplayName="Visual Studio MPF 16.0" d:Source="Installed" Version="[16.0,17.0)" />
   </Dependencies>
   <Assets>
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="GlobalUsingsAnalyzer" Path="|GlobalUsingsAnalyzer|"/>

@@ -1,10 +1,10 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Rename;
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,70 +16,64 @@ namespace GlobalUsingsAnalyzer
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
-            get { return ImmutableArray.Create(GlobalUsingsAnalyzerAnalyzer.DiagnosticId); }
+            get => ImmutableArray.Create(GlobalUsingsAnalyzer.DiagnosticId);
         }
 
-        public sealed override FixAllProvider GetFixAllProvider()
-        {
+        public sealed override FixAllProvider GetFixAllProvider() =>
             // See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/FixAllProvider.md for more information on Fix All Providers
-            return WellKnownFixAllProviders.BatchFixer;
-        }
+            WellKnownFixAllProviders.BatchFixer;
 
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-
-            // TODO: Replace the following code with your own analysis, generating a CodeAction for each fix to suggest
             var diagnostic = context.Diagnostics.First();
+            var fileName = diagnostic.Properties.ContainsKey("GlobalUsingsFileName") ? diagnostic.Properties["GlobalUsingsFileName"] : "GlobalUsings.cs";
             var diagnosticSpan = diagnostic.Location.SourceSpan;
-
-            // Find the type declaration identified by the diagnostic.
-            //var declaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().First();
-            //var x = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf();
-            //// Register a code action that will invoke the fix.
-            ///
-            var syntax = root.FindToken(diagnosticSpan.Start);
-
-            _ = "";
-            //    context.RegisterCodeFix(
-            //CodeAction.Create(
-            //    title: CodeFixResources.CodeFixTitle,
-            //    createChangedDocument: c => Fix(context.Document, syntax, c),
-            //    equivalenceKey: nameof(CodeFixResources.CodeFixTitle)),
-            //diagnostic);
-            //context.RegisterCodeFix(
-            //    CodeAction.Create(
-            //        title: CodeFixResources.CodeFixTitle,
-            //        createChangedSolution: c => MakeUppercaseAsync(context.Document, declaration, c),
-            //        equivalenceKey: nameof(CodeFixResources.CodeFixTitle)),
-            //    diagnostic);
+            var syntax = root.FindToken(diagnosticSpan.Start).Parent;
+            context.RegisterCodeFix(
+                CustomCodeAction.Create(
+                title: CodeFixResources.CodeFixTitle,
+                createChangedDocument: (c, isPreview) => Fix(context.Document, syntax, isPreview, fileName, c),
+                equivalenceKey: nameof(CodeFixResources.CodeFixTitle)),
+                diagnostic
+            );
         }
 
-        //async Task<Document> Fix(Document document, IEnumerable<SyntaxNode> syntax, CancellationToken cancellationToken)
-        //{
-        //    var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-        //    //var nextToken = syntax.GetNextToken();
-        //    return document.WithSyntaxRoot(root
-        //        .RemoveNodes(syntax, SyntaxRemoveOptions.KeepNoTrivia));
-        //}
-
-        private async Task<Solution> MakeUppercaseAsync(Document document, TypeDeclarationSyntax typeDecl, CancellationToken cancellationToken)
+        async Task<Document> Fix(Document document, SyntaxNode syntax, bool isPreview, string filename, CancellationToken cancellationToken)
         {
-            // Compute new uppercase name.
-            var identifierToken = typeDecl.Identifier;
-            var newName = identifierToken.Text.ToUpperInvariant();
-
-            // Get the symbol representing the type to be renamed.
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var typeSymbol = semanticModel.GetDeclaredSymbol(typeDecl, cancellationToken);
-
-            // Produce a new solution that has all references to that type renamed, including the declaration.
-            var originalSolution = document.Project.Solution;
-            var optionSet = originalSolution.Workspace.Options;
-            var newSolution = await Renamer.RenameSymbolAsync(document.Project.Solution, typeSymbol, newName, optionSet, cancellationToken).ConfigureAwait(false);
-
-            // Return the new solution with the now-uppercase type name.
-            return newSolution;
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return document;
+            }
+            var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+            if (!isPreview)
+            {
+                var count = 0;
+                while (count < 3)
+                {
+                    try
+                    {
+                        var csproj = document.Project.FilePath;
+                        var file = new FileInfo(csproj);
+                        var directory = file.Directory;
+                        var text = syntax.GetText().ToString().Trim('\r', '\n');
+                        var globalUsings = new FileInfo($"{directory.FullName}\\{filename}");
+                        if (!(globalUsings.Exists && File.ReadAllText(globalUsings.FullName).Contains(text)))
+                        {
+                            using (var writer = globalUsings.AppendText())
+                            {
+                                await writer.WriteLineAsync($"global {text}").ConfigureAwait(false);
+                            }
+                        }
+                    }
+                    catch (Exception) { }
+                    finally
+                    {
+                        count++;
+                    }
+                }
+            }
+            return document.WithSyntaxRoot(root.RemoveNodes(new List<SyntaxNode> { syntax }, SyntaxRemoveOptions.KeepNoTrivia));
         }
     }
 }

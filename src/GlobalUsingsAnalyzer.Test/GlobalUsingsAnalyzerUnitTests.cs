@@ -1,9 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.Testing;
+using Microsoft.CodeAnalysis.Testing.Verifiers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using VerifyCS = GlobalUsingsAnalyzer.Test.CSharpCodeFixVerifier<
-    GlobalUsingsAnalyzer.GlobalUsingsAnalyzerAnalyzer,
+    GlobalUsingsAnalyzer.GlobalUsingsAnalyzer,
     GlobalUsingsAnalyzer.GlobalUsingsAnalyzerCodeFixProvider>;
-
 namespace GlobalUsingsAnalyzer.Test
 {
     [TestClass]
@@ -23,24 +25,43 @@ namespace GlobalUsingsAnalyzer.Test
         public async Task TestMethod2()
         {
             var test = @"
-    {|#0:using System;|}
+    using System;
+    using System.Collections.Generic;
     namespace ConsoleApplication1
     {
         class Class1
         {   
         }
     }";
-
-            var fixtest = @"
-    namespace ConsoleApplication1
+            var fixtest = @"    namespace ConsoleApplication1
     {
         class Class1
         {   
         }
     }";
-
-            var expected = VerifyCS.Diagnostic("GlobalUsingsAnalyzer").WithLocation(0);
-            await VerifyCS.VerifyCodeFixAsync(test, expected, fixtest);
+            var analyzerFix = new CSharpCodeFixTest<GlobalUsingsAnalyzer,
+                GlobalUsingsAnalyzerCodeFixProvider, MSTestVerifier>
+            {
+                TestState =
+                {
+                    Sources = { test }
+                },
+                FixedState =
+                {
+                    Sources = { fixtest }
+                }
+            };
+            analyzerFix.TestState.ExpectedDiagnostics.Add(
+                new DiagnosticResult(
+                    "GlobalUsingsAnalyzer",
+                    Microsoft.CodeAnalysis.DiagnosticSeverity.Warning
+                    ).WithLocation(2, 5));
+            analyzerFix.TestState.ExpectedDiagnostics.Add(
+    new DiagnosticResult(
+        "GlobalUsingsAnalyzer",
+        Microsoft.CodeAnalysis.DiagnosticSeverity.Warning
+        ).WithLocation(3, 5));
+            await analyzerFix.RunAsync();
         }
     }
 }

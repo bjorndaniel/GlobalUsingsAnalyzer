@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.VisualBasic.Testing;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GlobalUsingsAnalyzer.Test
+namespace Analyzer1.Test
 {
     public static partial class VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix>
         where TAnalyzer : DiagnosticAnalyzer, new()

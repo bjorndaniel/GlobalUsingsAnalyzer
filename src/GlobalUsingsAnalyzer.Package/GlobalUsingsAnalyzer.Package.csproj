@@ -10,21 +10,40 @@
   <PropertyGroup>
     <PackageId>GlobalUsingsAnalyzer</PackageId>
     <PackageVersion>1.0.0.0</PackageVersion>
-    <Authors>elici</Authors>
-    <PackageLicenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</PackageLicenseUrl>
-    <PackageProjectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</PackageProjectUrl>
-    <PackageIconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</PackageIconUrl>
-    <RepositoryUrl>http://REPOSITORY_URL_HERE_OR_DELETE_THIS_LINE</RepositoryUrl>
+    <Authors>BDSoftware</Authors>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/bjorndaniel/GlobalUsingsAnalyzer</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Description>GlobalUsingsAnalyzer</Description>
-    <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
-    <Copyright>Copyright</Copyright>
-    <PackageTags>GlobalUsingsAnalyzer, analyzers</PackageTags>
+	<ProjectTitle>Global usings analyzer</ProjectTitle>
+	<ProjectSummary>Will suggest moving all using statements to a single file in each project.</ProjectSummary>
+    <Description>A C# analyzer that will suggest moving usings to a single project file. Defaults to GlobalUsings.cs but can be changed using a .editorconfig setting</Description>
+    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <Copyright>2022 BDSoftware</Copyright>
+    <PackageTags>C#, global usings, analyzers</PackageTags>
     <DevelopmentDependency>true</DevelopmentDependency>
     <NoPackageAnalysis>true</NoPackageAnalysis>
 
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+
+    <Title>Global usings analyzer</Title>
+
+    <PackageIcon>logo.png</PackageIcon>
+
+    <PackAsTool>False</PackAsTool>
+
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\GlobalUsingsAnalyzer.Vsix\logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GlobalUsingsAnalyzer.CodeFixes\GlobalUsingsAnalyzer.CodeFixes.csproj" />

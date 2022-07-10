@@ -3,9 +3,9 @@ using Microsoft.CodeAnalysis.Testing;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GlobalUsingsAnalyzer.Test
+namespace Analyzer1.Test
 {
-    public static partial class VisualBasicCodeRefactoringVerifier<TCodeRefactoring>
+    public static partial class CSharpCodeRefactoringVerifier<TCodeRefactoring>
         where TCodeRefactoring : CodeRefactoringProvider, new()
     {
         /// <inheritdoc cref="CodeRefactoringVerifier{TCodeRefactoring, TTest, TVerifier}.VerifyRefactoringAsync(string, string)"/>
