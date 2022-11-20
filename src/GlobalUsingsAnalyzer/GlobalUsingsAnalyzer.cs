@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
@@ -27,7 +28,7 @@ namespace GlobalUsingsAnalyzer
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-
+            //var languageVersion = ((CSharpParseOptions)(await context.Document.GetSyntaxTreeAsync(context.CancellationToken))?.Options)?.LanguageVersion ?? LanguageVersion.CSharp6;
             // TODO: Consider registering other actions that act on syntax instead of or in addition to symbols
             // See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
             //context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
@@ -37,26 +38,64 @@ namespace GlobalUsingsAnalyzer
         private static void AnalyzeUsings(SyntaxTreeAnalysisContext context)
         {
             var config = context.Options.AnalyzerConfigOptionsProvider.GetOptions(context.Tree);
-            if (config.TryGetValue("dotnet_diagnostic.GlobalUsingsAnalyzer.global_usings_filename", out var fileName))
+            if (config.TryGetValue("dotnet_diagnostic.GlobalUsingsAnalyzer0002.enabled", out var enabled))
+            {
+                if (enabled?.Equals("false", StringComparison.OrdinalIgnoreCase) ?? false)
+                {
+                    return;
+                }
+            }
+
+            if (config.TryGetValue("dotnet_diagnostic.GlobalUsingsAnalyzer0001.filename", out var fileName))
             {
                 GlobalUsingFileName = fileName;
             }
-            var root = context.Tree.GetCompilationUnitRoot();
-            if (context.Tree.FilePath.Contains(GlobalUsingFileName))
+
+            Severity = DiagnosticSeverity.Warning;
+            if (config.TryGetValue("dotnet_diagnostic.GlobalUsingsAnalyzer0003.diagnostic_severity", out var severityString))
             {
-                return;
-            }
-            if (root?.Usings.Any() ?? false)
-            {
-                var properties = new Dictionary<string, string>();
-                properties.Add("GlobalUsingsFileName", GlobalUsingFileName);
-                foreach (var usng in root.Usings)
+
+                switch (severityString.ToLower())
                 {
-                    var diagnostic = Diagnostic.Create(Rule, usng.GetLocation(), properties.ToImmutableDictionary(), usng.Name, GlobalUsingFileName);
-                    context.ReportDiagnostic(diagnostic);
+                    case "error":
+                        Severity = DiagnosticSeverity.Error;
+                        break;
+                    case "info":
+                        Severity = DiagnosticSeverity.Info;
+                        break;
+                    case "hidden":
+                        Severity = DiagnosticSeverity.Hidden;
+                        break;
+                    default:
+                        Severity = DiagnosticSeverity.Warning;
+                        break;
+                }
+            }
+
+            var langVersion = (int)(((CSharpParseOptions)context.Tree.Options)?.SpecifiedLanguageVersion ?? LanguageVersion.CSharp6);
+            if (langVersion == 0 || langVersion >= (int)LanguageVersion.CSharp10)
+            {
+                var root = context.Tree.GetCompilationUnitRoot();
+                if (context.Tree.FilePath.Contains(GlobalUsingFileName))
+                {
+                    return;
+                }
+                if (root?.Usings.Any() ?? false)
+                {
+                    var properties = new Dictionary<string, string>
+                    {
+                        { "GlobalUsingsFileName", GlobalUsingFileName }
+                    };
+                    foreach (var usng in root.Usings)
+                    {
+                        var diagnostic = Diagnostic
+                            .Create(Rule, usng.GetLocation(), Severity, null, properties.ToImmutableDictionary(), usng.Name, GlobalUsingFileName);
+                        context.ReportDiagnostic(diagnostic);
+                    }
                 }
             }
         }
         public static string GlobalUsingFileName { get; private set; } = "GlobalUsings.cs";
+        public static DiagnosticSeverity Severity { get; private set; } = DiagnosticSeverity.Warning;
     }
 }

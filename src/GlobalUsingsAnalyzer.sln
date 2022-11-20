@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GlobalUsingsAnalyzer.Vsix",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{F7AE3800-D50F-4895-BA30-E64FE68A95EB}"
 	ProjectSection(SolutionItems) = preProject
-		ReadMe.md = ReadMe.md
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlobalUsingsAnalyzerVS2022", "GlobalUsingsAnalyzerVS2022\GlobalUsingsAnalyzerVS2022.csproj", "{51620D79-AC52-42B9-9CBA-E088B902409D}"
