@@ -8,6 +8,8 @@ To change the name of the file (defaults to GlobalUsings.cs) add the following .
 
 **Note: The diagnostics must be placed under the [*.cs] entry to work**
 
+Also available as a NuGet package for per-project installs: [GlobalUsingsAnalyzer](https://www.nuget.org/packages/GlobalUsingsAnalyzer)
+
 ## Release Notes
 
 ### 1.1
