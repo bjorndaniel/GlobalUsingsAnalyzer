@@ -1,4 +1,4 @@
-# Global usings analyzer
+﻿# Global usings analyzer
 
 A C# analyzer that will suggest moving usings to a single project file. Defaults to GlobalUsings.cs
 
