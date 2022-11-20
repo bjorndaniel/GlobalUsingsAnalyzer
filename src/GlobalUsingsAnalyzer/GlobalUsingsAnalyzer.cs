@@ -1,9 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 
 namespace GlobalUsingsAnalyzer
 {
@@ -37,23 +37,43 @@ namespace GlobalUsingsAnalyzer
 
         private static void AnalyzeUsings(SyntaxTreeAnalysisContext context)
         {
-
             var config = context.Options.AnalyzerConfigOptionsProvider.GetOptions(context.Tree);
-            if (config.TryGetValue("dotnet_diagnostic.GlobalUsingsAnalyzer.global_usings_filename", out var fileName))
+            if (config.TryGetValue("dotnet_diagnostic.GlobalUsingsAnalyzer0002.enabled", out var enabled))
+            {
+                if (enabled?.Equals("false", StringComparison.OrdinalIgnoreCase) ?? false)
+                {
+                    return;
+                }
+            }
+
+            if (config.TryGetValue("dotnet_diagnostic.GlobalUsingsAnalyzer0001.filename", out var fileName))
             {
                 GlobalUsingFileName = fileName;
             }
-            //if (config.TryGetValue("dotnet_diagnostic.GlobalUsingsAnalyzer.global_usings_enabled", out var fileName))
-            //{
-            //    GlobalUsingFileName = fileName;
-            //}
 
+            Severity = DiagnosticSeverity.Warning;
+            if (config.TryGetValue("dotnet_diagnostic.GlobalUsingsAnalyzer0003.diagnostic_severity", out var severityString))
+            {
+
+                switch (severityString.ToLower())
+                {
+                    case "error":
+                        Severity = DiagnosticSeverity.Error;
+                        break;
+                    case "info":
+                        Severity = DiagnosticSeverity.Info;
+                        break;
+                    case "hidden":
+                        Severity = DiagnosticSeverity.Hidden;
+                        break;
+                    default:
+                        Severity = DiagnosticSeverity.Warning;
+                        break;
+                }
+            }
 
             var langVersion = (int)(((CSharpParseOptions)context.Tree.Options)?.SpecifiedLanguageVersion ?? LanguageVersion.CSharp6);
-            Debug.WriteLine("//////////////////////////////////////////////////////");
-            Debug.WriteLine(langVersion.ToString());
-            Debug.WriteLine("//////////////////////////////////////////////////////");
-            if (langVersion >= (int)LanguageVersion.CSharp10)
+            if (langVersion == 0 || langVersion >= (int)LanguageVersion.CSharp10)
             {
                 var root = context.Tree.GetCompilationUnitRoot();
                 if (context.Tree.FilePath.Contains(GlobalUsingFileName))
@@ -63,17 +83,19 @@ namespace GlobalUsingsAnalyzer
                 if (root?.Usings.Any() ?? false)
                 {
                     var properties = new Dictionary<string, string>
-                {
-                    { "GlobalUsingsFileName", GlobalUsingFileName }
-                };
+                    {
+                        { "GlobalUsingsFileName", GlobalUsingFileName }
+                    };
                     foreach (var usng in root.Usings)
                     {
-                        var diagnostic = Diagnostic.Create(Rule, usng.GetLocation(), properties.ToImmutableDictionary(), usng.Name, GlobalUsingFileName);
+                        var diagnostic = Diagnostic
+                            .Create(Rule, usng.GetLocation(), Severity, null, properties.ToImmutableDictionary(), usng.Name, GlobalUsingFileName);
                         context.ReportDiagnostic(diagnostic);
                     }
                 }
             }
         }
         public static string GlobalUsingFileName { get; private set; } = "GlobalUsings.cs";
+        public static DiagnosticSeverity Severity { get; private set; } = DiagnosticSeverity.Warning;
     }
 }

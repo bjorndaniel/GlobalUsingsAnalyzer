@@ -6,11 +6,16 @@ To change the name of the file (defaults to GlobalUsings.cs) add the following .
 
 **dotnet_diagnostic.GlobalUsingsAnalyzer.global_usings_filename = FILENAME.cs**
 
+**Note: The diagnostics must be placed under the [*.cs] entry to work**
+
 ## Release Notes
 
 ### 1.1
 
+- Changed name of filename setting to dotnet_diagnostic.GlobalUsingsAnalyzer0001.filename
 - Do not report issues when C# version is lower than C# 10 (first version to support Global Usings) 
+- Added new setting dotnet_diagnostic.GlobalUsingsAnalyzer0002.enabled used to disable the analyzer for a specific project/solution
+- Added new setting dotnet_diagnostic.GlobalUsingsAnalyzer0003.diagnostic_severity used to control the severity of the diagnostic. Can be one of the following: error, info, warning, hidden
 
 ### 1.0
 
