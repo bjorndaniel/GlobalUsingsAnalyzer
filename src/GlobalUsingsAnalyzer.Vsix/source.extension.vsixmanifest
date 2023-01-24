@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="0e53c8a5-e6b3-41ea-b169-b824407356f4" Version="1.0" Language="en-US" Publisher="BDSoftware"/>
+    <Identity Id="0e53c8a5-e6b3-41ea-b169-b824407356f4" Version="1.1" Language="en-US" Publisher="BDSoftware"/>
     <DisplayName>Global usings analyzer</DisplayName>
     <Description xml:space="preserve">A C# Roslyn analyzer to move using statements to a single file in each project.</Description>
 	<Icon>logo.png</Icon>
