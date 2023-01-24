@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="06b1c6fd-1817-4bd8-a15c-239cb1f52c80" Version="1.0" Language="en-US" Publisher="BDSoftware" />
+        <Identity Id="06b1c6fd-1817-4bd8-a15c-239cb1f52c80" Version="1.2.1" Language="en-US" Publisher="BDSoftware" />
         <DisplayName>Global usings analyzer</DisplayName>
         <Description xml:space="preserve">A C# analyzer that will suggest moving usings to a single project file. Defaults to GlobalUsings.cs but can be changed using a .editorconfig setting</Description>
         <Icon>logo.png</Icon>

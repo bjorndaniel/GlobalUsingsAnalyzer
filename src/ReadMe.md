@@ -12,6 +12,10 @@ Also available as a NuGet package for per-project installs: [GlobalUsingsAnalyze
 
 ## Release Notes
 
+### 1.2 
+
+- Fixed a bug where the directory structure was wrong in Mac/Linux.
+
 ### 1.1
 
 - Changed name of filename setting to dotnet_diagnostic.GlobalUsingsAnalyzer0001.filename

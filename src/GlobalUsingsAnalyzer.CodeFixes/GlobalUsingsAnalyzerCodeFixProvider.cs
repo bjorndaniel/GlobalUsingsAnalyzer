@@ -57,7 +57,7 @@ namespace GlobalUsingsAnalyzer
                         var file = new FileInfo(csproj);
                         var directory = file.Directory;
                         var text = syntax.GetText().ToString().Trim('\r', '\n');
-                        var globalUsings = new FileInfo($"{directory.FullName}\\{filename}");
+                        var globalUsings = new FileInfo($"{directory.FullName}{Path.DirectorySeparatorChar}{filename}");
                         if (!(globalUsings.Exists && File.ReadAllText(globalUsings.FullName).Contains(text)))
                         {
                             using (var writer = globalUsings.AppendText())

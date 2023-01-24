@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <PackageId>GlobalUsingsAnalyzer</PackageId>
-    <PackageVersion>1.0.1</PackageVersion>
+    <PackageVersion>1.2.0</PackageVersion>
     <Authors>BDSoftware</Authors>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/bjorndaniel/GlobalUsingsAnalyzer</RepositoryUrl>
@@ -22,7 +22,7 @@
     <PackageTags>C#, global usings, analyzers</PackageTags>
     <DevelopmentDependency>true</DevelopmentDependency>
     <NoPackageAnalysis>true</NoPackageAnalysis>
-
+	<PackageReadmeFile>README.md</PackageReadmeFile>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
 
     <Title>Global usings analyzer</Title>
@@ -31,7 +31,6 @@
 
     <PackAsTool>False</PackAsTool>
 
-    <PackageReadmeFile></PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,6 +38,7 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+	  <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
