@@ -12,6 +12,9 @@ Also available as a NuGet package for per-project installs: [GlobalUsingsAnalyze
 
 ## Release Notes
 
+### 1.3 
+- Fixed a bug where moving usings would move preceeding comments/directives.
+
 ### 1.2 
 
 - Fixed a bug where the directory structure was wrong in Mac/Linux.
