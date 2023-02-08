@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 using System.Composition;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -54,7 +55,7 @@ namespace GlobalUsingsAnalyzer
                     try
                     {
                         var csproj = document.Project.FilePath;
-                        var file = new FileInfo(csproj);
+                        var file = new FileInfo(csproj ?? Assembly.GetExecutingAssembly().Location);
                         var directory = file.Directory;
                         var text = syntax.GetText().ToString().Trim('\r', '\n');
                         var globalUsings = new FileInfo($"{directory.FullName}{Path.DirectorySeparatorChar}{filename}");
@@ -73,7 +74,17 @@ namespace GlobalUsingsAnalyzer
                     }
                 }
             }
-            return document.WithSyntaxRoot(root.RemoveNodes(new List<SyntaxNode> { syntax }, SyntaxRemoveOptions.KeepNoTrivia));
+            var newDocument = document
+                .WithSyntaxRoot(root.RemoveNodes(new List<SyntaxNode> { syntax },
+                SyntaxRemoveOptions.KeepExteriorTrivia));
+            var newRoot = await newDocument.GetSyntaxRootAsync();
+            if (newRoot.HasLeadingTrivia)
+            {
+                var trivia = newRoot.GetLeadingTrivia();
+                var newTrivia =  trivia.Where(_ => !_.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.EmptyStatement));
+                return newDocument.WithSyntaxRoot(newRoot.WithLeadingTrivia(newTrivia));
+            }
+            return newDocument;
         }
     }
 }
