@@ -52,7 +52,7 @@ namespace GlobalUsingsAnalyzer
             }
 
             Severity = DiagnosticSeverity.Warning;
-            if (config.TryGetValue("dotnet_diagnostic.GlobalUsingsAnalyzer0003.diagnostic_severity", out var severityString))
+            if (config.TryGetValue("dotnet_diagnostic.GlobalUsingsAnalyzer0003.severity", out var severityString))
             {
 
                 switch (severityString.ToLower())
